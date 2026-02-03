@@ -1,282 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
+<meta charset="UTF-8">
+<title>For You ❤️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family: Georgia, serif;
+body{
+min-height:100vh;
+background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+}.floating-hearts span{ position:absolute; color:rgba(255,255,255,0.7); animation:floatUp 10s linear infinite; font-size:18px; } @keyframes floatUp{ 0%{transform:translateY(100vh) scale(1);opacity:0} 20%{opacity:1} 100%{transform:translateY(-10vh) scale(1.5);opacity:0} }
 
-  <!-- TIP: This makes the page mobile friendly -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+.card{ background:rgba(255,255,255,0.18); backdrop-filter:blur(14px); border-radius:25px; padding:35px; max-width:420px; width:90%; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.25); animation:float 4s ease-in-out infinite; } @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 
-  <!-- TIP: You can change the page title here -->
-  <title>Will you be my Valentine?</title>
+.heart{ font-size:60px; margin-bottom:10px; animation:pulse 3.5s infinite; } @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
 
-  <!-- Confetti library (leave this as it is for the celebration effect) -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+h1{font-size:2.2rem;margin-bottom:10px;color:#fff}
 
-  <style>
-    /* ===== TIP: CHANGE COLORS HERE ===== */
-    :root {
-      --bg1: #ffd6e7;       /* main background color  */
-      --bg2: #ffeef6;       /* lighter gradient color */
-      --card: #ffffffcc;    /* card background        */
-      --yes: #ff3b7a;       /* yes button color       */
-      --yesHover: #ff1f68;  /* yes button hover       */
-    }
+.text{ font-size:1.05rem; line-height:1.7; margin-top:10px; color:#fff; min-height:120px; }
 
-    * { box-sizing: border-box; }
+button{ margin-top:20px; background:#ff4d6d; border:none; color:white; padding:12px 25px; border-radius:30px; font-size:1rem; cursor:pointer; transition:0.3s; box-shadow:0 10px 20px rgba(0,0,0,0.25); } button:hover{transform:scale(1.05);background:#ff335c}
 
-    body {
-      margin: 0;
-      min-height: 100svh;
-      display: grid;
-      place-items: center;
-      background: radial-gradient(circle at top, var(--bg2), var(--bg1));
-      font-family: system-ui, sans-serif;
-      overflow: hidden;
-      padding: 16px;
-    }
+.reveal{ display:none; }
 
-    /* Confetti canvas - don’t touch unless you know canvas stuff 😄 */
-    #confettiCanvas {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 9999;
-    }
+.type{ border-right:2px solid rgba(255,255,255,0.8); white-space:pre-wrap; overflow:hidden; } </style>
 
-    .card {
-      width: min(720px, 92vw);
-      padding: 26px 22px;
-      background: var(--card);
-      backdrop-filter: blur(10px);
-      border-radius: 22px;
-      text-align: center;
-      box-shadow: 0 18px 60px rgba(0,0,0,.15);
-    }
-
-    /* TIP: Change size of cartoon here */
-    .art {
-      width: min(260px, 80vw);
-      margin: 0 auto 10px;
-      display: block;
-    }
-
-    /* TIP: Change question text size here */
-    h1 {
-      font-size: clamp(26px, 4vw, 44px);
-      margin: 12px 0 18px;
-    }
-
-    .button-zone {
-      position: relative;
-      width: min(520px, 92%);
-      height: 150px;
-      margin: 0 auto;
-    }
-
-    /* TIP: Button style settings */
-    button {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      padding: 16px 24px;
-      font-size: 18px;
-      font-weight: 800;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      transition: transform .12s ease, background .12s ease;
-    }
-
-#yesBtn {
-  left: 18%;
-  background: var(--yes);
-  color: #fff;
-  z-index: 10;
-}
-
-    #yesBtn:hover {
-      background: var(--yesHover);
-    }
-
-    #noBtn {
-  left: 62%;
-  background: #e5e7eb;
-  color: #111827;
-  z-index: 1;
-}
-
-    /* TIP: Default hint message style */
-    .hint {
-      margin-top: 10px;
-      font-size: 13px;
-      opacity: .7;
-    }
-
-    .result {
-      display: none;
-      margin-top: 18px;
-    }
-  </style>
 </head>
+<body><div class="floating-hearts" id="hearts"></div><div class="card">
+  <div class="heart">❤️</div>
+  <h1>This Is For You Butterscotch</h1>  <div class="text type" id="type"></div><button id="btn" onclick="startReveal()">Tap ❤️</button>
 
-<body>
-
-  <canvas id="confettiCanvas"></canvas>
-
-  <main class="card">
-
-    <!-- ===== TIP: THIS IS THE CARTOON ===== -->
-    <!-- You can replace this whole SVG with any image if you want -->
-<svg class="art" viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="fur" x1="0" x2="1">
-      <stop offset="0" stop-color="#ffd8b5"/>
-      <stop offset="1" stop-color="#ffb380"/>
-    </linearGradient>
-
-    <linearGradient id="heart" x1="0" x2="1">
-      <stop offset="0" stop-color="#ff5b8a"/>
-      <stop offset="1" stop-color="#ff1f68"/>
-    </linearGradient>
-  </defs>
-
-  <!-- Floating Heart -->
-  <path d="M240 40 C240 22 260 14 272 28
-           C284 14 304 22 304 40
-           C304 68 272 82 272 96
-           C272 82 240 68 240 40Z"
-        fill="url(#heart)"/>
-
-  <!-- Cute Round Body -->
-  <ellipse cx="160" cy="140" rx="100" ry="90" fill="url(#fur)"/>
-
-  <!-- Ears -->
-  <path d="M80 80 Q70 40 110 60 Z" fill="#ffb380"/>
-  <path d="M240 80 Q250 40 210 60 Z" fill="#ffb380"/>
-
-  <!-- Eyes -->
-  <circle cx="125" cy="130" r="10" fill="#222"/>
-  <circle cx="195" cy="130" r="10" fill="#222"/>
-
-  <!-- Eye Sparkles -->
-  <circle cx="121" cy="126" r="3" fill="#fff"/>
-  <circle cx="191" cy="126" r="3" fill="#fff"/>
-
-  <!-- Cute Blush Cheeks -->
-  <circle cx="110" cy="150" r="8" fill="#ff8fb1" opacity="0.6"/>
-  <circle cx="210" cy="150" r="8" fill="#ff8fb1" opacity="0.6"/>
-
-  <!-- Tiny Smile -->
-  <path d="M140 160 Q160 175 180 160" 
-        stroke="#333" stroke-width="4" fill="none" stroke-linecap="round"/>
-
-  <!-- Little Nose -->
-  <circle cx="160" cy="148" r="4" fill="#444"/>
-</svg>
-    <!-- TIP: Change the main question here -->
- <h1 id="question">Pragya will you be my valentine?</h1>
-
-    <section class="button-zone">
-      <button id="yesBtn">Yes</button>
-      <button id="noBtn">No</button>
-    </section>
-
-    <!-- TIP: Default hint text -->
-    <div class="hint" id="hint">“No” seems a bit shy 😈</div>
-
-    <section class="result" id="result">
-      <!-- TIP: Change success message here -->
-    <h2 style="font-size:40px;">YAY! 🎉</h2>
-    </section>
-
-  </main>
-
-  <script>
-
-    const yesBtn = document.getElementById("yesBtn");
-    const noBtn = document.getElementById("noBtn");
-    const result = document.getElementById("result");
-    const hint = document.getElementById("hint");
-
-    const confettiCanvas = document.getElementById("confettiCanvas");
-
-    function resizeConfettiCanvas() {
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
-      confettiCanvas.width = Math.floor(window.innerWidth * dpr);
-      confettiCanvas.height = Math.floor(window.innerHeight * dpr);
-    }
-
-    resizeConfettiCanvas();
-
-    const confettiInstance = confetti.create(confettiCanvas, {
-      resize: false,
-      useWorker: true
-    });
-
-    /* ===== TIP: Confetti effect settings ===== */
-    function fullScreenConfetti() {
-      const end = Date.now() + 4000;
-
-      (function frame() {
-        confettiInstance({
-          particleCount: 12,
-          spread: 200,
-          startVelocity: 60,
-        });
-        if (Date.now() < end) requestAnimationFrame(frame);
-      })();
-    }
-
-    /* ===== TIP: How big the YES button can get ===== */
-    let yesScale = 1;
-
-    function growYes() {
-  yesScale = Math.min(8, yesScale + 0.21);
-
-  // Move YES slightly toward the NO button as it grows
-  let moveRight = (yesScale - 1) * 20;
-
-  yesBtn.style.transform =
-    `translate(${moveRight}px, -50%) scale(${yesScale})`;
-}
-
-    /* ===== TIP: WHAT HAPPENS WHEN NO IS CLICKED ===== */
-const messages = [
-  "Pragya are you sure about that? 😅",
-  "Think again... 💖",
-  "Don't do this babe 🚨",
-  "Nope, try clicking YES 😏",
-  "The YES button looks lonely 🥺",
-  "Don’t break my heart 💔",
-  "You’re running out of options 😈",
-  "Just say YES already! 😄",
-  "Resistance is futile 😌",
-  "No button doesn’t actually work 😜"
-  
+</div><script>
+const lines = [
+  "I know today might not be your best day…",
+  "",
+  "But I want you to know something simple:",
+  "",
+  "You matter.",
+  "You’re loved.",
+  "And you make my world better just by existing.",
+  "",
+  "Even on your worst days —",
+  "you’re still my favorite person.",
+  "",
+  "If I could, I’d hug you through this screen.",
+  "",
+  "",
+  "You’re safe.",
+  "You’re loved.",
+  "You’re never alone. ❤️",
+  "I love you my love."
 ];
 
-let clickCount = 0;
+let i=0,j=0;
+function startReveal(){
+  document.getElementById('btn').style.display='none';
+  typeLine();
+}
 
-noBtn.addEventListener("click", () => {
-  hint.textContent = messages[clickCount % messages.length];
-  clickCount++;
-hint.style.fontSize = (10+ clickCount) + "px";
-  growYes();
-});
+function typeLine(){
+  if(i<lines.length){
+    if(j<lines[i].length){
+      document.getElementById('type').innerHTML += lines[i].charAt(j);
+      j++;
+      setTimeout(typeLine,45);
+    }else{
+      document.getElementById('type').innerHTML += "\n";
+      i++; j=0;
+      setTimeout(typeLine,350);
+    }
+  }
+}
 
-    /* ===== TIP: WHAT HAPPENS WHEN YES IS CLICKED ===== */
-    yesBtn.addEventListener("click", () => {
-  document.getElementById("question").style.display = "none";
-  document.querySelector(".button-zone").style.display = "none";
-  hint.style.display = "none";
-
-  result.style.display = "block";
-  fullScreenConfetti();
-});
-
-  </script>
-</body>
+const hearts = document.getElementById('hearts');
+for(let i=0;i<25;i++){
+  const span=document.createElement('span');
+  span.innerHTML='❤️';
+  span.style.left=Math.random()*100+'vw';
+  span.style.animationDuration=(6+Math.random()*6)+'s';
+  span.style.fontSize=(12+Math.random()*20)+'px';
+  span.style.animationDelay=Math.random()*5+'s';
+  hearts.appendChild(span);
+}
+</script></body>
 </html>
-
